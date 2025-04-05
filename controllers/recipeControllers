@@ -1,0 +1,72 @@
+const Recipe = require('../models/recipe');
+
+const recipeControllers = {
+    getAllrecipes : async(request,response)=>{
+        try {
+            const recipes = await Recipe.find();
+            response.status(200).json(recipes);
+            response.json({message:'Receved...'})
+        } catch (error) {
+            
+        }
+    },
+    getRecipesId : async(request,response)=>{
+        try {
+            const { id } = request.params
+            const recipe = await Recipe.findById(id);
+            if(!recipe){
+                response.status(404).json({message:'Recipe Not found'})
+            }
+
+            response.status(200).json(recipe);
+        } catch (error) {
+            
+        }
+    },
+    createRecipes : async(request,response)=>{
+        try {
+            const {name,ingredients,steps,cooking_time,servings,cuisine,dietary_restrictions} = request.body;
+
+            const newRecipe = new Recipe({
+                name,
+                ingredients,
+                steps,
+                cooking_time,
+                servings,
+                cuisine,
+                dietary_restrictions
+            });
+
+            await newRecipe.save();
+
+            response.status(201).json(newRecipe);
+        } catch (error) {
+            response.status(500).json(error)
+        }
+    },
+    updateRecipes : async(request,response)=>{
+        try {
+            const { id } = request.params
+            const recipe = await Recipe.findById(id);
+            
+            const { servings } = request.body;
+            recipe.servings = servings;
+            await recipe.save();
+            response.status(200).json(recipe);
+        } catch (error) {
+            
+        }
+    },
+    deleteRecipes : async(request,response)=>{
+        try {
+            const { id } = request.params
+            const recipe = await Recipe.findByIdAndDelete(id);
+
+            response.status(202).json({message:'Recipe Deleted Successfully...'});
+        } catch (error) {
+            
+        }
+    }
+}
+
+module.exports = recipeControllers;
